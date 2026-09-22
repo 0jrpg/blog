@@ -1,0 +1,12 @@
+{
+  "slug": "bem-vindo-a-nevoa",
+  "title": "Bem-vindo à névoa",
+  "date": "2026-09-22",
+  "excerpt": "Um blog que vive dentro do próprio repositório: cada post é um arquivo JSON, e o site se atualiza sozinho.",
+  "tags": ["meta", "primeiro-post"],
+  "content": [
+    "Este blog não tem banco de dados. Cada texto que você lê aqui é um arquivo `.json` dentro da pasta `posts/` deste repositório no GitHub.",
+    "Quando este arquivo é adicionado e o `index.json` é atualizado com a entrada correspondente, o site busca essas informações direto do GitHub em tempo real — sem precisar recompilar ou publicar nada de novo. Basta dar `git push`.",
+    "A ideia é simples: o conteúdo é dado, não código. Isso deixa a manutenção do blog reduzida a escrever um arquivo de texto estruturado."
+  ]
+}
