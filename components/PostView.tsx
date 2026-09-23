@@ -1,5 +1,8 @@
+"use client";
+
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import Link from "next/link";
+import { useParams, useRouter } from "next/navigation";
 import { fetchPost, forgetPost, primeIndex } from "../lib/posts";
 import { deletePost, loadEditablePost } from "../lib/github";
 import { formatDate } from "../lib/format";
@@ -10,7 +13,7 @@ import StatusPanel from "./StatusPanel";
 export default function PostView() {
   const { slug } = useParams<{ slug: string }>();
   const { token, canEdit, isAdmin } = useAuth();
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const [post, setPost] = useState<Post | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -45,7 +48,7 @@ export default function PostView() {
       await deletePost(token, slug, sha, post.title);
       forgetPost(slug);
       primeIndex((current) => current.filter((p) => p.slug !== slug));
-      navigate("/");
+      router.push("/");
     } catch (err) {
       setDeleteError(err instanceof Error ? err.message : "Erro ao apagar o post.");
       setDeleting(false);
@@ -68,13 +71,13 @@ export default function PostView() {
 
   return (
     <article className="glass article">
-      <Link to="/" className="back-link">
+      <Link href="/" className="back-link">
         ← voltar para todos os posts
       </Link>
 
       {canEdit && (
         <div className="editor-toolbar">
-          <Link to={`/post/${post.slug}/editar`} className="btn btn-ghost">
+          <Link href={`/post/${post.slug}/editar`} className="btn btn-ghost">
             Editar
           </Link>
           {isAdmin && (

@@ -1,12 +1,24 @@
-import { useState } from "react";
+"use client";
+
+import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
-import { Navigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 import { useAuth } from "../context/AuthContext";
-import { GITHUB_OWNER, GITHUB_REPO } from "../config";
+import { GITHUB_OWNER, GITHUB_REPO } from "../lib/config";
 
 export default function LoginPage() {
   const { login, status, error, role, username } = useAuth();
   const [token, setToken] = useState("");
+  const router = useRouter();
+
+  const loggedInWithoutAccess = status === "ready" && !!username && !role;
+  const loggedInWithAccess = status === "ready" && !!username && !!role;
+
+  useEffect(() => {
+    if (loggedInWithAccess) {
+      router.replace("/");
+    }
+  }, [loggedInWithAccess, router]);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -14,11 +26,9 @@ export default function LoginPage() {
     await login(token.trim());
   }
 
-  const loggedInWithoutAccess = status === "ready" && username && !role;
-  const loggedInWithAccess = status === "ready" && username && role;
-
   if (loggedInWithAccess) {
-    return <Navigate to="/" replace />;
+    // Evita renderizar o formulário por um instante enquanto redireciona.
+    return null;
   }
 
   return (

@@ -2,8 +2,8 @@
 // Configuração central. Troque estes três valores pelos do SEU repositório.
 // É daqui que o site busca, em tempo real, os arquivos dentro de posts/*.json.
 // -----------------------------------------------------------------------------
-export const GITHUB_OWNER = "seu-usuario";
-export const GITHUB_REPO = "liquid-blog";
+export const GITHUB_OWNER = "0jrpg";
+export const GITHUB_REPO = "blog";
 export const GITHUB_BRANCH = "main";
 
 // Base para arquivos "crus" do repositório (CORS liberado, sem necessidade de token).

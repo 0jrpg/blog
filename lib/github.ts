@@ -1,4 +1,4 @@
-import { GITHUB_BRANCH, GITHUB_OWNER, GITHUB_REPO } from "../config";
+import { GITHUB_BRANCH, GITHUB_OWNER, GITHUB_REPO } from "./config";
 import type { Collaborator, Post, PostFormData, PostIndex, PostMeta, Role } from "../types";
 
 const API_BASE = "https://api.github.com";

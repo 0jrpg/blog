@@ -1,5 +1,3 @@
-@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap");
-
 :root {
   /* ---- paleta ---------------------------------------------------------- */
   --void: #05070f;
@@ -13,10 +11,6 @@
   --line: rgba(233, 237, 247, 0.14);
   --line-strong: rgba(233, 237, 247, 0.28);
 
-  /* ---- tipografia -------------------------------------------------------- */
-  --font-display: "Space Grotesk", "Segoe UI", sans-serif;
-  --font-body: "IBM Plex Sans", "Segoe UI", sans-serif;
-
   /* ---- forma -------------------------------------------------------------- */
   --radius-lg: 28px;
   --radius-md: 18px;
@@ -28,8 +22,7 @@
 }
 
 html,
-body,
-#root {
+body {
   min-height: 100%;
 }
 
@@ -37,7 +30,7 @@ body {
   margin: 0;
   background: var(--void);
   color: var(--mist);
-  font-family: var(--font-body);
+  font-family: var(--font-body), "Segoe UI", sans-serif;
   font-size: 16px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
@@ -51,7 +44,7 @@ a {
 h1,
 h2,
 h3 {
-  font-family: var(--font-display);
+  font-family: var(--font-display), "Segoe UI", sans-serif;
   margin: 0;
   letter-spacing: -0.01em;
 }
@@ -153,7 +146,6 @@ button {
     inset 0 1px 0 rgba(255, 255, 255, 0.16);
 }
 
-/* brilho especular sutil no canto superior */
 .glass::before {
   content: "";
   position: absolute;
@@ -193,7 +185,7 @@ button {
 }
 
 .brand {
-  font-family: var(--font-display);
+  font-family: var(--font-display), "Segoe UI", sans-serif;
   font-size: 1.15rem;
   font-weight: 600;
   text-decoration: none;
@@ -219,171 +211,6 @@ button {
   display: flex;
   align-items: center;
   gap: 10px;
-}
-
-/* --------------------------------------------------------------------------
-   Botões
-   -------------------------------------------------------------------------- */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  font-family: var(--font-body);
-  font-size: 0.92rem;
-  font-weight: 500;
-  padding: 11px 20px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--line-strong);
-  background: rgba(233, 237, 247, 0.04);
-  color: var(--mist);
-  cursor: pointer;
-  text-decoration: none;
-  transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1), border-color 220ms ease, background 220ms ease;
-}
-
-.btn:hover:not(:disabled) {
-  transform: translateY(-1px);
-  border-color: var(--line-strong);
-  background: rgba(233, 237, 247, 0.08);
-}
-
-.btn:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.btn-primary {
-  background: linear-gradient(120deg, var(--azure), var(--violet));
-  border-color: transparent;
-  color: #06090f;
-  font-weight: 600;
-}
-
-.btn-primary:hover:not(:disabled) {
-  filter: brightness(1.08);
-}
-
-.btn-ghost {
-  background: transparent;
-}
-
-.btn-danger {
-  border-color: rgba(255, 110, 110, 0.4);
-  color: #ffb3b3;
-}
-
-.btn-danger:hover:not(:disabled) {
-  background: rgba(255, 110, 110, 0.1);
-  border-color: rgba(255, 110, 110, 0.6);
-}
-
-.btn-small {
-  padding: 8px 14px;
-  font-size: 0.82rem;
-}
-
-.badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.82rem;
-  color: var(--haze);
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  padding: 6px 12px;
-}
-
-.badge em {
-  font-style: normal;
-  color: var(--azure);
-  font-size: 0.72rem;
-  border-left: 1px solid var(--line);
-  padding-left: 8px;
-}
-
-/* --------------------------------------------------------------------------
-   Formulários
-   -------------------------------------------------------------------------- */
-.form {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  max-width: 60ch;
-}
-
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  font-size: 0.9rem;
-  color: var(--haze);
-}
-
-.field small {
-  color: var(--haze-dim);
-  font-size: 0.78rem;
-}
-
-.field input,
-.field textarea {
-  font-family: var(--font-body);
-  font-size: 0.98rem;
-  color: var(--mist);
-  background: rgba(233, 237, 247, 0.05);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
-  padding: 12px 14px;
-  resize: vertical;
-  outline: none;
-  transition: border-color 200ms ease, background 200ms ease;
-}
-
-.field input:focus,
-.field textarea:focus {
-  border-color: var(--azure);
-  background: rgba(233, 237, 247, 0.08);
-}
-
-.field input:disabled {
-  opacity: 0.6;
-}
-
-.form-error {
-  color: #ffb3b3;
-  font-size: 0.88rem;
-  margin: 0;
-}
-
-.token-help {
-  padding: 24px 28px;
-  font-size: 0.9rem;
-  color: var(--haze);
-}
-
-.token-help strong {
-  color: var(--mist);
-  font-family: var(--font-display);
-}
-
-.token-help ol {
-  margin: 12px 0 0;
-  padding-left: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.token-help a {
-  color: var(--azure);
-  text-decoration: underline;
-}
-
-.editor-toolbar {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
 }
 
 /* hero / manifesto */
@@ -490,7 +317,7 @@ button {
   flex-shrink: 0;
   font-size: 0.82rem;
   color: var(--haze-dim);
-  font-family: var(--font-display);
+  font-family: var(--font-display), "Segoe UI", sans-serif;
 }
 
 .post-row .excerpt {
@@ -561,7 +388,7 @@ button {
   color: var(--mist);
   display: block;
   margin-bottom: 6px;
-  font-family: var(--font-display);
+  font-family: var(--font-display), "Segoe UI", sans-serif;
 }
 
 .spinner {
@@ -585,6 +412,171 @@ footer.site-footer {
   text-align: center;
   color: var(--haze-dim);
   font-size: 0.82rem;
+}
+
+/* --------------------------------------------------------------------------
+   Botões
+   -------------------------------------------------------------------------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: var(--font-body), "Segoe UI", sans-serif;
+  font-size: 0.92rem;
+  font-weight: 500;
+  padding: 11px 20px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line-strong);
+  background: rgba(233, 237, 247, 0.04);
+  color: var(--mist);
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1), border-color 220ms ease, background 220ms ease;
+}
+
+.btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: var(--line-strong);
+  background: rgba(233, 237, 247, 0.08);
+}
+
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-primary {
+  background: linear-gradient(120deg, var(--azure), var(--violet));
+  border-color: transparent;
+  color: #06090f;
+  font-weight: 600;
+}
+
+.btn-primary:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.btn-ghost {
+  background: transparent;
+}
+
+.btn-danger {
+  border-color: rgba(255, 110, 110, 0.4);
+  color: #ffb3b3;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: rgba(255, 110, 110, 0.1);
+  border-color: rgba(255, 110, 110, 0.6);
+}
+
+.btn-small {
+  padding: 8px 14px;
+  font-size: 0.82rem;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  color: var(--haze);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 6px 12px;
+}
+
+.badge em {
+  font-style: normal;
+  color: var(--azure);
+  font-size: 0.72rem;
+  border-left: 1px solid var(--line);
+  padding-left: 8px;
+}
+
+/* --------------------------------------------------------------------------
+   Formulários
+   -------------------------------------------------------------------------- */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 60ch;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: var(--haze);
+}
+
+.field small {
+  color: var(--haze-dim);
+  font-size: 0.78rem;
+}
+
+.field input,
+.field textarea {
+  font-family: var(--font-body), "Segoe UI", sans-serif;
+  font-size: 0.98rem;
+  color: var(--mist);
+  background: rgba(233, 237, 247, 0.05);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  resize: vertical;
+  outline: none;
+  transition: border-color 200ms ease, background 200ms ease;
+}
+
+.field input:focus,
+.field textarea:focus {
+  border-color: var(--azure);
+  background: rgba(233, 237, 247, 0.08);
+}
+
+.field input:disabled {
+  opacity: 0.6;
+}
+
+.form-error {
+  color: #ffb3b3;
+  font-size: 0.88rem;
+  margin: 0;
+}
+
+.token-help {
+  padding: 24px 28px;
+  font-size: 0.9rem;
+  color: var(--haze);
+}
+
+.token-help strong {
+  color: var(--mist);
+  font-family: var(--font-display), "Segoe UI", sans-serif;
+}
+
+.token-help ol {
+  margin: 12px 0 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.token-help a {
+  color: var(--azure);
+  text-decoration: underline;
+}
+
+.editor-toolbar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
 }
 
 @media (max-width: 640px) {

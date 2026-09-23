@@ -1,4 +1,4 @@
-import { rawPostsUrl } from "../config";
+import { rawPostsUrl } from "./config";
 import type { Post, PostIndex, PostMeta } from "../types";
 
 let indexCache: { data: PostMeta[]; fetchedAt: number } | null = null;

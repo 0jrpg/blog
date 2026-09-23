@@ -1,5 +1,7 @@
+"use client";
+
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { fetchPostList } from "../lib/posts";
 import { formatDate, formatDateShort } from "../lib/format";
 import type { PostMeta } from "../types";
@@ -56,7 +58,7 @@ export default function PostList() {
 
       {!error && posts && posts.length > 0 && (
         <>
-          <Link to={`/post/${posts[0].slug}`} className="glass glass--interactive featured">
+          <Link href={`/post/${posts[0].slug}`} className="glass glass--interactive featured">
             <span className="eyebrow">post mais recente</span>
             <h2>{posts[0].title}</h2>
             <p className="excerpt">{posts[0].excerpt}</p>
@@ -66,7 +68,7 @@ export default function PostList() {
           {posts.length > 1 && (
             <div className="glass post-list" style={{ padding: "8px 30px" }}>
               {posts.slice(1).map((post) => (
-                <Link key={post.slug} to={`/post/${post.slug}`} className="post-row">
+                <Link key={post.slug} href={`/post/${post.slug}`} className="post-row">
                   <div className="post-row-top">
                     <h3>{post.title}</h3>
                     <time dateTime={post.date}>{formatDateShort(post.date)}</time>

@@ -1,5 +1,7 @@
+"use client";
+
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "../context/AuthContext";
 import { loadEditablePost, updatePost } from "../lib/github";
 import { primeIndex, primePost } from "../lib/posts";
@@ -10,7 +12,7 @@ import type { PostFormData } from "../types";
 export default function EditPostPage() {
   const { slug } = useParams<{ slug: string }>();
   const { token } = useAuth();
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const [initial, setInitial] = useState<PostFormData | null>(null);
   const [postSha, setPostSha] = useState<string | null>(null);
@@ -56,7 +58,7 @@ export default function EditPostPage() {
             : p
         )
       );
-      navigate(`/post/${post.slug}`);
+      router.push(`/post/${post.slug}`);
     } catch (err) {
       setSubmitError(err instanceof Error ? err.message : "Erro desconhecido ao salvar.");
       setSubmitting(false);

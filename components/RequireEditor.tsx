@@ -1,13 +1,25 @@
+"use client";
+
+import { useEffect } from "react";
 import type { ReactNode } from "react";
-import { Navigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 import { useAuth } from "../context/AuthContext";
 import StatusPanel from "./StatusPanel";
 
 export default function RequireEditor({ children }: { children: ReactNode }) {
   const { status, canEdit, token } = useAuth();
+  const router = useRouter();
+
+  const shouldRedirectToLogin = !token && status !== "checking";
+
+  useEffect(() => {
+    if (shouldRedirectToLogin) {
+      router.replace("/login");
+    }
+  }, [shouldRedirectToLogin, router]);
 
   if (!token) {
-    return <Navigate to="/login" replace />;
+    return <StatusPanel kind="loading" title="Redirecionando para o login…" />;
   }
 
   if (status === "checking" || status === "idle") {

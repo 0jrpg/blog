@@ -1,5 +1,7 @@
+"use client";
+
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 import { useAuth } from "../context/AuthContext";
 import { createPost, slugExists } from "../lib/github";
 import { primeIndex, primePost } from "../lib/posts";
@@ -17,7 +19,7 @@ const emptyForm: PostFormData = {
 
 export default function NewPostPage() {
   const { token } = useAuth();
-  const navigate = useNavigate();
+  const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -39,7 +41,7 @@ export default function NewPostPage() {
         { slug: post.slug, title: post.title, date: post.date, excerpt: post.excerpt, tags: post.tags },
         ...current,
       ]);
-      navigate(`/post/${post.slug}`);
+      router.push(`/post/${post.slug}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro desconhecido ao publicar.");
       setSubmitting(false);
