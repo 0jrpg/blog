@@ -15,6 +15,10 @@ export interface EmbedAttrs {
 
 // Tipo recursivo pro "DOM output spec" do ProseMirror: uma tag, seus
 // atributos, e filhos que por sua vez podem ser texto ou outra tag aninhada.
+// (Usado só como ajuda ao montar a estrutura abaixo — o retorno final do
+// renderHTML fica com tipo `any` de propósito: o formato exato esperado pelo
+// ProseMirror para specs aninhados é difícil de expressar com precisão no
+// TypeScript, e o formato aqui é validado em runtime pelo próprio ProseMirror.)
 type DomNode = string | readonly [string, Record<string, string>, ...DomNode[]];
 
 declare module "@tiptap/core" {
@@ -69,7 +73,7 @@ export const EmbedBlock = Node.create({
     ];
   },
 
-  renderHTML({ HTMLAttributes }): DomNode {
+  renderHTML({ HTMLAttributes }) {
     const { url, label, variant, title, description, image, contentType } = HTMLAttributes as EmbedAttrs;
 
     const outerAttrs = mergeAttributes({
@@ -84,8 +88,10 @@ export const EmbedBlock = Node.create({
       class: `embed-card embed-${variant}`,
     });
 
+    let tree: DomNode;
+
     if (variant === "button") {
-      return [
+      tree = [
         "div",
         outerAttrs,
         [
@@ -94,9 +100,7 @@ export const EmbedBlock = Node.create({
           label || url,
         ],
       ];
-    }
-
-    if (variant === "preview") {
+    } else if (variant === "preview") {
       const thumbnail: DomNode = image
         ? ["img", { src: image, alt: title || label || "", class: "embed-image" }]
         : ["div", { class: `embed-icon embed-icon-${contentType}` }, contentType === "pdf" ? "PDF" : "🔗"];
@@ -107,7 +111,7 @@ export const EmbedBlock = Node.create({
       }
       const textBlock: DomNode = ["div", { class: "embed-text" }, ...textChildren];
 
-      return [
+      tree = [
         "div",
         outerAttrs,
         [
@@ -117,18 +121,23 @@ export const EmbedBlock = Node.create({
           textBlock,
         ],
       ];
+    } else {
+      // variant "link": um link simples, mas com a mesma linguagem visual
+      tree = [
+        "div",
+        outerAttrs,
+        [
+          "a",
+          { href: url, target: "_blank", rel: "noopener noreferrer nofollow", class: "embed-simple-link" },
+          label || url,
+        ],
+      ];
     }
 
-    // variant "link": um link simples, mas com a mesma linguagem visual
-    return [
-      "div",
-      outerAttrs,
-      [
-        "a",
-        { href: url, target: "_blank", rel: "noopener noreferrer nofollow", class: "embed-simple-link" },
-        label || url,
-      ],
-    ];
+    // O tipo exato que o ProseMirror espera aqui (DOMOutputSpec, recursivo e
+    // pouco expressável com precisão no TypeScript) é validado em runtime
+    // pelo próprio ProseMirror — por isso o cast explícito abaixo.
+    return tree as any;
   },
 
   addCommands() {
