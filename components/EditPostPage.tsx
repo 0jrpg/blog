@@ -2,38 +2,35 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { useAuth } from "../context/AuthContext";
-import { loadEditablePost, updatePost } from "../lib/github";
-import { primeIndex, primePost } from "../lib/posts";
+import { fetchPostForEditing, updatePost } from "../lib/posts";
 import PostEditor from "./PostEditor";
 import StatusPanel from "./StatusPanel";
 import type { PostFormData } from "../types";
 
 export default function EditPostPage() {
   const { slug } = useParams<{ slug: string }>();
-  const { token } = useAuth();
   const router = useRouter();
 
   const [initial, setInitial] = useState<PostFormData | null>(null);
-  const [postSha, setPostSha] = useState<string | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!token || !slug) return;
+    if (!slug) return;
     let active = true;
-    loadEditablePost(token, slug)
-      .then(({ sha, data }) => {
+    fetchPostForEditing(slug)
+      .then((post) => {
         if (!active) return;
-        setPostSha(sha);
         setInitial({
-          title: data.title,
-          slug: data.slug,
-          date: data.date,
-          excerpt: data.excerpt,
-          tags: data.tags ?? [],
-          content: data.content,
+          title: post.title,
+          slug: post.slug,
+          date: post.date,
+          excerpt: post.excerpt,
+          tags: post.tags,
+          visibility: post.visibility,
+          theme: post.theme,
+          html: post.html,
         });
       })
       .catch((err: unknown) => {
@@ -42,22 +39,14 @@ export default function EditPostPage() {
     return () => {
       active = false;
     };
-  }, [token, slug]);
+  }, [slug]);
 
   async function handleSubmit(data: PostFormData) {
-    if (!token || !slug || !postSha) return;
+    if (!slug) return;
     setSubmitting(true);
     setSubmitError(null);
     try {
-      const post = await updatePost(token, slug, data, postSha);
-      primePost(post);
-      primeIndex((current) =>
-        current.map((p) =>
-          p.slug === slug
-            ? { slug: post.slug, title: post.title, date: post.date, excerpt: post.excerpt, tags: post.tags }
-            : p
-        )
-      );
+      const post = await updatePost(slug, data);
       router.push(`/post/${post.slug}`);
     } catch (err) {
       setSubmitError(err instanceof Error ? err.message : "Erro desconhecido ao salvar.");

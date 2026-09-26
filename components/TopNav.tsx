@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useAuth } from "../context/AuthContext";
+import { signOut, useSession } from "next-auth/react";
 
 export default function TopNav() {
-  const { username, role, canEdit, logout, status } = useAuth();
+  const { data: session, status } = useSession();
+  const canEdit = session?.user?.role === "admin" || session?.user?.role === "colaborador";
 
   return (
     <nav className="top-nav">
@@ -19,18 +20,18 @@ export default function TopNav() {
           </Link>
         )}
 
-        {username ? (
+        {session?.user ? (
           <div className="nav-user">
             <span className="badge">
-              {username}
-              {role && <em>{role}</em>}
+              {session.user.login}
+              {session.user.role && <em>{session.user.role}</em>}
             </span>
-            <button className="btn btn-ghost btn-small" onClick={logout}>
+            <button className="btn btn-ghost btn-small" onClick={() => signOut({ callbackUrl: "/" })}>
               Sair
             </button>
           </div>
         ) : (
-          status !== "checking" && (
+          status !== "loading" && (
             <Link href="/login" className="btn btn-ghost btn-small">
               Entrar
             </Link>

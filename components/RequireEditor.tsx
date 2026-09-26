@@ -2,28 +2,27 @@
 
 import { useEffect } from "react";
 import type { ReactNode } from "react";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "../context/AuthContext";
 import StatusPanel from "./StatusPanel";
 
 export default function RequireEditor({ children }: { children: ReactNode }) {
-  const { status, canEdit, token } = useAuth();
+  const { data: session, status } = useSession();
   const router = useRouter();
 
-  const shouldRedirectToLogin = !token && status !== "checking";
+  const canEdit = session?.user?.role === "admin" || session?.user?.role === "colaborador";
+  const shouldRedirect = status === "unauthenticated";
 
   useEffect(() => {
-    if (shouldRedirectToLogin) {
-      router.replace("/login");
-    }
-  }, [shouldRedirectToLogin, router]);
+    if (shouldRedirect) router.replace("/login");
+  }, [shouldRedirect, router]);
 
-  if (!token) {
-    return <StatusPanel kind="loading" title="Redirecionando para o login…" />;
+  if (status === "loading") {
+    return <StatusPanel kind="loading" title="Verificando sessão…" />;
   }
 
-  if (status === "checking" || status === "idle") {
-    return <StatusPanel kind="loading" title="Verificando permissões…" />;
+  if (status === "unauthenticated") {
+    return <StatusPanel kind="loading" title="Redirecionando para o login…" />;
   }
 
   if (!canEdit) {

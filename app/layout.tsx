@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { IBM_Plex_Sans, Space_Grotesk } from "next/font/google";
 import "./globals.css";
-import { AuthProvider } from "@/context/AuthContext";
+import Providers from "./providers";
 import GlassBackground from "@/components/GlassBackground";
 import TopNav from "@/components/TopNav";
 
@@ -29,7 +29,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="pt-BR">
       <body className={`${displayFont.variable} ${bodyFont.variable}`}>
-        <AuthProvider>
+        <Providers>
           <GlassBackground />
           <div className="page">
             <TopNav />
@@ -38,7 +38,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               feito com vidro, névoa e alguns arquivos .json
             </footer>
           </div>
-        </AuthProvider>
+        </Providers>
       </body>
     </html>
   );

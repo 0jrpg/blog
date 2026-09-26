@@ -1,56 +1,66 @@
-import { rawPostsUrl } from "./config";
-import type { Post, PostIndex, PostMeta } from "../types";
+import type { Post, PostFormData, PostIndexEntry } from "../types";
 
-let indexCache: { data: PostMeta[]; fetchedAt: number } | null = null;
-const postCache = new Map<string, Post>();
-
-// Evita martelar o GitHub a cada re-render: revalida no máximo 1x por minuto.
-const REVALIDATE_MS = 60_000;
-
-async function fetchJson<T>(url: string): Promise<T> {
-  const res = await fetch(url, { cache: "no-store" });
+async function json<T>(res: Response): Promise<T> {
+  const body = await res.json();
   if (!res.ok) {
-    throw new Error(`Falha ao buscar ${url}: HTTP ${res.status}`);
+    throw new Error(body?.error || `Erro HTTP ${res.status}`);
   }
-  return (await res.json()) as T;
+  return body as T;
 }
 
-export async function fetchPostList(force = false): Promise<PostMeta[]> {
-  const isFresh = indexCache && Date.now() - indexCache.fetchedAt < REVALIDATE_MS;
-  if (!force && isFresh) {
-    return indexCache!.data;
-  }
+/* ---------------------------------------------------------------------- */
+/* leitura pública (qualquer visitante)                                    */
+/* ---------------------------------------------------------------------- */
 
-  const data = await fetchJson<PostIndex>(rawPostsUrl("index.json"));
-  const sorted = [...data.posts].sort((a, b) => (a.date < b.date ? 1 : -1));
-  indexCache = { data: sorted, fetchedAt: Date.now() };
-  return sorted;
+export async function fetchPublicPostList(): Promise<PostIndexEntry[]> {
+  const res = await fetch("/api/posts", { cache: "no-store" });
+  const data = await json<{ posts: PostIndexEntry[] }>(res);
+  return data.posts;
 }
 
-export async function fetchPost(slug: string): Promise<Post> {
-  const cached = postCache.get(slug);
-  if (cached) return cached;
-
-  const data = await fetchJson<Post>(rawPostsUrl(`${slug}.json`));
-  postCache.set(slug, data);
-  return data;
+export async function fetchPublicPost(slug: string): Promise<Post> {
+  const res = await fetch(`/api/posts/${slug}`, { cache: "no-store" });
+  const data = await json<{ post: Post }>(res);
+  return data.post;
 }
 
-/**
- * Injeta no cache local o resultado de uma escrita feita pela interface de
- * edição. Serve para o autor ver o post publicado imediatamente, sem
- * esperar a propagação do raw.githubusercontent.com (que pode levar
- * alguns segundos).
- */
-export function primePost(post: Post): void {
-  postCache.set(post.slug, post);
+/* ---------------------------------------------------------------------- */
+/* leitura/escrita administrativa (precisa de sessão admin/colaborador)    */
+/* ---------------------------------------------------------------------- */
+
+export async function fetchAllPosts(): Promise<PostIndexEntry[]> {
+  const res = await fetch("/api/admin/posts", { cache: "no-store" });
+  const data = await json<{ posts: PostIndexEntry[] }>(res);
+  return data.posts;
 }
 
-export function primeIndex(updater: (current: PostMeta[]) => PostMeta[]): void {
-  const current = indexCache?.data ?? [];
-  indexCache = { data: updater(current), fetchedAt: Date.now() };
+export async function fetchPostForEditing(slug: string): Promise<Post> {
+  const res = await fetch(`/api/admin/posts/${slug}`, { cache: "no-store" });
+  const data = await json<{ post: Post }>(res);
+  return data.post;
 }
 
-export function forgetPost(slug: string): void {
-  postCache.delete(slug);
+export async function createPost(form: PostFormData): Promise<Post> {
+  const res = await fetch("/api/admin/posts", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(form),
+  });
+  const data = await json<{ post: Post }>(res);
+  return data.post;
+}
+
+export async function updatePost(slug: string, form: PostFormData): Promise<Post> {
+  const res = await fetch(`/api/admin/posts/${slug}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(form),
+  });
+  const data = await json<{ post: Post }>(res);
+  return data.post;
+}
+
+export async function deletePost(slug: string): Promise<void> {
+  const res = await fetch(`/api/admin/posts/${slug}`, { method: "DELETE" });
+  await json(res);
 }

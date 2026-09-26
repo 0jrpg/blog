@@ -1,24 +1,36 @@
 {
   "name": "liquid-blog",
   "private": true,
-  "version": "1.0.0",
-  "description": "Blog futurista 'liquid glass' em Next.js, com posts em JSON lidos direto do GitHub e deploy na Vercel.",
+  "version": "2.0.0",
+  "description": "Blog 'liquid glass' em Next.js: login de admin/colaborador via backend (GitHub OAuth), posts criptografados em repouso no GitHub, visibilidade publica/so-link/privada, e editor rico.",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "new-post": "node scripts/new-post.mjs"
+    "lint": "next lint"
   },
   "dependencies": {
     "next": "^15.1.0",
+    "next-auth": "^4.24.8",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "sanitize-html": "^2.13.1",
+    "server-only": "^0.0.1",
+    "@tiptap/react": "^2.11.5",
+    "@tiptap/core": "^2.11.5",
+    "@tiptap/starter-kit": "^2.11.5",
+    "@tiptap/extension-text-style": "^2.11.5",
+    "@tiptap/extension-color": "^2.11.5",
+    "@tiptap/extension-highlight": "^2.11.5",
+    "@tiptap/extension-underline": "^2.11.5",
+    "@tiptap/extension-link": "^2.11.5",
+    "@tiptap/extension-placeholder": "^2.11.5"
   },
   "devDependencies": {
     "@types/node": "^20.14.0",
     "@types/react": "^18.3.5",
     "@types/react-dom": "^18.3.0",
+    "@types/sanitize-html": "^2.13.0",
     "typescript": "^5.5.4",
     "webpack-obfuscator": "^3.5.1"
   }

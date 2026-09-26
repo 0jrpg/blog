@@ -3,17 +3,25 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { fetchPost, forgetPost, primeIndex } from "../lib/posts";
-import { deletePost, loadEditablePost } from "../lib/github";
+import { useSession } from "next-auth/react";
+import { deletePost, fetchPublicPost } from "../lib/posts";
 import { formatDate } from "../lib/format";
-import { useAuth } from "../context/AuthContext";
 import type { Post } from "../types";
 import StatusPanel from "./StatusPanel";
 
+const VISIBILITY_LABEL: Record<Post["visibility"], string> = {
+  public: "público",
+  unlisted: "só com o link",
+  private: "privado",
+};
+
 export default function PostView() {
   const { slug } = useParams<{ slug: string }>();
-  const { token, canEdit, isAdmin } = useAuth();
+  const { data: session } = useSession();
   const router = useRouter();
+
+  const canEdit = session?.user?.role === "admin" || session?.user?.role === "colaborador";
+  const isAdmin = session?.user?.role === "admin";
 
   const [post, setPost] = useState<Post | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -25,7 +33,7 @@ export default function PostView() {
     let active = true;
     setPost(null);
     setError(null);
-    fetchPost(slug)
+    fetchPublicPost(slug)
       .then((data) => {
         if (active) setPost(data);
       })
@@ -38,16 +46,12 @@ export default function PostView() {
   }, [slug]);
 
   async function handleDelete() {
-    if (!token || !slug || !post) return;
+    if (!slug || !post) return;
     if (!window.confirm(`Apagar o post "${post.title}"? Isso não pode ser desfeito.`)) return;
-
     setDeleting(true);
     setDeleteError(null);
     try {
-      const { sha } = await loadEditablePost(token, slug);
-      await deletePost(token, slug, sha, post.title);
-      forgetPost(slug);
-      primeIndex((current) => current.filter((p) => p.slug !== slug));
+      await deletePost(slug);
       router.push("/");
     } catch (err) {
       setDeleteError(err instanceof Error ? err.message : "Erro ao apagar o post.");
@@ -56,13 +60,7 @@ export default function PostView() {
   }
 
   if (error) {
-    return (
-      <StatusPanel
-        kind="error"
-        title="Não foi possível carregar este post"
-        detail={error}
-      />
-    );
+    return <StatusPanel kind="error" title="Não foi possível carregar este post" detail={error} />;
   }
 
   if (!post) {
@@ -70,7 +68,7 @@ export default function PostView() {
   }
 
   return (
-    <article className="glass article">
+    <article className={`glass article theme-${post.theme}`}>
       <Link href="/" className="back-link">
         ← voltar para todos os posts
       </Link>
@@ -89,10 +87,14 @@ export default function PostView() {
       )}
       {deleteError && <p className="form-error">{deleteError}</p>}
 
+      <span className={`visibility-pill visibility-${post.visibility}`}>
+        {VISIBILITY_LABEL[post.visibility]}
+      </span>
+
       <h1>{post.title}</h1>
       <p className="meta">
         {formatDate(post.date)}
-        {post.tags && post.tags.length > 0 && (
+        {post.tags.length > 0 && (
           <span className="tags" style={{ display: "inline-flex", marginLeft: 12 }}>
             {post.tags.map((tag) => (
               <span key={tag} className="tag">
@@ -102,11 +104,9 @@ export default function PostView() {
           </span>
         )}
       </p>
-      <div className="article-body">
-        {post.content.map((paragraph, i) => (
-          <p key={i}>{paragraph}</p>
-        ))}
-      </div>
+
+      {/* post.html já foi sanitizado no servidor antes de ser gravado */}
+      <div className="article-body rich-content" dangerouslySetInnerHTML={{ __html: post.html }} />
     </article>
   );
 }
