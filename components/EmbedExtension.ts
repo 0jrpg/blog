@@ -13,6 +13,10 @@ export interface EmbedAttrs {
   contentType: EmbedContentType;
 }
 
+// Tipo recursivo pro "DOM output spec" do ProseMirror: uma tag, seus
+// atributos, e filhos que por sua vez podem ser texto ou outra tag aninhada.
+type DomNode = string | readonly [string, Record<string, string>, ...DomNode[]];
+
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
     embedBlock: {
@@ -65,7 +69,7 @@ export const EmbedBlock = Node.create({
     ];
   },
 
-  renderHTML({ HTMLAttributes }) {
+  renderHTML({ HTMLAttributes }): DomNode {
     const { url, label, variant, title, description, image, contentType } = HTMLAttributes as EmbedAttrs;
 
     const outerAttrs = mergeAttributes({
@@ -81,33 +85,50 @@ export const EmbedBlock = Node.create({
     });
 
     if (variant === "button") {
-      return ["div", outerAttrs, ["a", { href: url, target: "_blank", rel: "noopener noreferrer nofollow", class: "embed-button" }, label || url]];
+      return [
+        "div",
+        outerAttrs,
+        [
+          "a",
+          { href: url, target: "_blank", rel: "noopener noreferrer nofollow", class: "embed-button" },
+          label || url,
+        ],
+      ];
     }
 
     if (variant === "preview") {
-      const children: (string | (string | Record<string, string>)[])[] = [];
-      if (image) {
-        children.push(["img", { src: image, alt: title || label || "", class: "embed-image" }]);
-      } else {
-        children.push(["div", { class: `embed-icon embed-icon-${contentType}` }, contentType === "pdf" ? "PDF" : "🔗"]);
-      }
-      const textChildren: (string | (string | Record<string, string>)[])[] = [
-        ["strong", {}, title || label || url],
-      ];
+      const thumbnail: DomNode = image
+        ? ["img", { src: image, alt: title || label || "", class: "embed-image" }]
+        : ["div", { class: `embed-icon embed-icon-${contentType}` }, contentType === "pdf" ? "PDF" : "🔗"];
+
+      const textChildren: DomNode[] = [["strong", {}, title || label || url]];
       if (description) {
         textChildren.push(["span", {}, description]);
       }
-      children.push(["div", { class: "embed-text" }, ...textChildren]);
+      const textBlock: DomNode = ["div", { class: "embed-text" }, ...textChildren];
 
       return [
         "div",
         outerAttrs,
-        ["a", { href: url, target: "_blank", rel: "noopener noreferrer nofollow", class: "embed-link" }, ...children],
+        [
+          "a",
+          { href: url, target: "_blank", rel: "noopener noreferrer nofollow", class: "embed-link" },
+          thumbnail,
+          textBlock,
+        ],
       ];
     }
 
     // variant "link": um link simples, mas com a mesma linguagem visual
-    return ["div", outerAttrs, ["a", { href: url, target: "_blank", rel: "noopener noreferrer nofollow", class: "embed-simple-link" }, label || url]];
+    return [
+      "div",
+      outerAttrs,
+      [
+        "a",
+        { href: url, target: "_blank", rel: "noopener noreferrer nofollow", class: "embed-simple-link" },
+        label || url,
+      ],
+    ];
   },
 
   addCommands() {
